@@ -1,0 +1,222 @@
+---
+swagger: "2.0"
+info:
+  version: "1"
+  title: "go-kafka"
+  contact: {}
+paths:
+  /products:
+    post:
+      tags:
+      - "Products"
+      summary: "Create new product"
+      description: "Create new single product"
+      operationId: "products_post"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - description: product description
+        in: query
+        name: description
+        required: true
+        type: string
+      - description: product name
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: product price
+        in: query
+        name: price
+        required: true
+        type: number
+      - description: product rating
+        in: query
+        name: rating
+        required: true
+        type: integer
+
+      responses:
+        "201":
+          description: "Created"
+          schema:
+            $ref: "#/definitions/models.Product"
+      x-swagger-router-controller: "swagger_server.controllers.products_controller"
+  /products/{product_id}:
+    get:
+      tags:
+      - "Products"
+      summary: "Get product by id"
+      description: "Get single product by id"
+      operationId: "products_product_id_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "product_id"
+        in: "path"
+        description: "product id"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/models.Product"
+      x-swagger-router-controller: "swagger_server.controllers.products_controller"
+    put:
+      tags:
+      - "Products"
+      summary: "Update single product"
+      description: "Update single product by id"
+      operationId: "products_product_id_put"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "product_id"
+        in: "path"
+        description: "product id"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/models.Product"
+      x-swagger-router-controller: "swagger_server.controllers.products_controller"
+  /products/search:
+    get:
+      tags:
+      - "Products"
+      summary: "Search product"
+      description: "Search product by name or description"
+      operationId: "products_search_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "search"
+        in: "query"
+        description: "search text"
+        required: false
+        type: "string"
+      - name: "page"
+        in: "query"
+        description: "page number"
+        required: false
+        type: "string"
+      - name: "size"
+        in: "query"
+        description: "number of elements"
+        required: false
+        type: "string"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/models.ProductsList"
+      x-swagger-router-controller: "swagger_server.controllers.products_controller"
+definitions:
+  models.Product:
+    type: "object"
+    required:
+    - "description"
+    - "name"
+    - "price"
+    - "quantity"
+    - "rating"
+    properties:
+      CategoryId:
+        type: "string"
+      createdAt:
+        type: "string"
+      description:
+        type: "string"
+      imageUrl:
+        type: "string"
+      name:
+        type: "string"
+      photos:
+        type: "array"
+        items:
+          type: "string"
+      price:
+        type: "number"
+      productId:
+        type: "string"
+      quantity:
+        type: "integer"
+      rating:
+        type: "integer"
+      updatedAt:
+        type: "string"
+    example:
+      CategoryId: "CategoryId"
+      createdAt: "createdAt"
+      quantity: 6
+      productId: "productId"
+      price: 0.80082819046101150206595775671303272247314453125
+      imageUrl: "imageUrl"
+      name: "name"
+      rating: 1
+      description: "description"
+      photos:
+      - "photos"
+      - "photos"
+      updatedAt: "updatedAt"
+  models.ProductsList:
+    type: "object"
+    properties:
+      hasMore:
+        type: "boolean"
+      page:
+        type: "integer"
+      products:
+        type: "array"
+        items:
+          $ref: "#/definitions/models.Product"
+      size:
+        type: "integer"
+      totalCount:
+        type: "integer"
+      totalPages:
+        type: "integer"
+    example:
+      size: 6
+      hasMore: true
+      totalPages: 5
+      page: 0
+      totalCount: 1
+      products:
+      - CategoryId: "CategoryId"
+        createdAt: "createdAt"
+        quantity: 6
+        productId: "productId"
+        price: 0.80082819046101150206595775671303272247314453125
+        imageUrl: "imageUrl"
+        name: "name"
+        rating: 1
+        description: "description"
+        photos:
+        - "photos"
+        - "photos"
+        updatedAt: "updatedAt"
+      - CategoryId: "CategoryId"
+        createdAt: "createdAt"
+        quantity: 6
+        productId: "productId"
+        price: 0.80082819046101150206595775671303272247314453125
+        imageUrl: "imageUrl"
+        name: "name"
+        rating: 1
+        description: "description"
+        photos:
+        - "photos"
+        - "photos"
+        updatedAt: "updatedAt"
