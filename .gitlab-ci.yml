@@ -1,0 +1,66 @@
+stages:
+  - testing
+  - history_copy
+  - reports
+  - deploy
+
+docker_job:
+  stage: testing
+  tags:
+    - docker
+  image: python:3.8-alpine
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - pytest -s -v pytest_fold --alluredir=allure_res --clean-alluredir
+  allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - ./allure_res
+    expire_in: 1 day
+
+history_job:
+  stage: history_copy
+  tags:
+    - docker
+  image: storytel/alpine-bash-curl
+  script:
+    - 'curl --location --output artifacts.zip "https://(ВАШ ДОМЕН, например gitlab.example.com)/api/v4/projects/(АЙДИ ВАШЕГО РЕПОЗИТОРИЯ)/jobs/artifacts/master/download?job=pages&job_token=$CI_JOB_TOKEN"'  # С помощью api гитлаба скачиваем файлы из job, который будет указан ниже. Обратите внимание на текст на русском в ссылке. Очень важно указать вместо текста и скобок номер вашего репозиториия
+    - apk add unzip
+    - unzip artifacts.zip
+    - chmod -R 777 public
+    - cp -r ./public/history ./allure_res
+  allow_failure: true
+  artifacts:
+    paths:
+      - ./allure_res
+    expire_in: 1 day
+  rules:
+    - when: always
+
+allure_job:
+  stage: reports
+  tags:
+    - docker
+  image: frankescobar/allure-docker-service
+  script:
+     - allure generate -c ./allure_res -o ./allure_report
+  artifacts:
+    paths:
+      - ./allure_res
+      - ./allure_report
+    expire_in: 1 day
+  rules:
+    - when: always
+
+pages:
+  stage: deploy
+  script:
+    - mkdir public
+    - mv ./allure_report/* public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - when: always
